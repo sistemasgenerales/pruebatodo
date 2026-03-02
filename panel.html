@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <title>REY LIMA – PANEL SUPERVISOR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b1220" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@600;800;900&display=swap" rel="stylesheet">
+  
+  <style>
+    :root{
+      --bg:#0b1220; --panel:#0f172a; --card:#111827; --white:#ffffff;
+      --muted:rgba(255,255,255,.72); --muted2:rgba(255,255,255,.55);
+      --line:rgba(255,255,255,.10); --primary:#2563eb; --danger:#ef4444;
+      --ok:#22c55e; --warning:#f59e0b; --radius:22px; --radius2:18px;
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --fsTitle: clamp(34px, 6vw, 52px); --fsSub: clamp(16px, 3vw, 22px);
+      --fsInput: clamp(22px, 4.4vw, 28px); --fsBtn: clamp(22px, 4.4vw, 28px);
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; overscroll-behavior: contain; -webkit-text-size-adjust: 100%; }
+    body{
+      margin:0; font-family:Inter,system-ui,-apple-system,sans-serif;
+      background: radial-gradient(1200px 700px at 50% 30%, rgba(37,99,235,.20), transparent 60%),
+                  radial-gradient(900px 600px at 50% 90%, rgba(34,197,94,.10), transparent 60%), var(--bg);
+      color:var(--white);
+    }
+    .screen{ min-height: 100svh; padding: calc(16px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom)) 14px; }
+    
+    .loginFull{ display:flex; align-items:center; justify-content:center; }
+    .loginFullShell{ width: 100%; max-width: 980px; display:flex; flex-direction:column; gap: 22px; padding: 10px 6px; }
+    .brand{ text-align:center; padding: 6px 10px 0; }
+    .brandBig{ margin-bottom: 6px; }
+    .brandTitle{ font-size: var(--fsTitle); font-weight: 900; letter-spacing:1px; line-height:1.02; }
+    .brandSub{ margin-top:10px; font-size: var(--fsSub); font-weight: 900; color: var(--muted); }
+    .loginFullCard{ width: 100%; background: rgba(17,24,39,.94); border: 1px solid var(--line); border-radius: 28px; box-shadow: var(--shadow); padding: 22px; }
+    .lbl{ display:block; font-weight: 900; color: var(--muted); margin: 6px 0 10px; font-size: 14px; letter-spacing:.2px; }
+    .lblBig{ font-size: 16px; }
+    
+    .inp{ width:100%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.14); color: var(--white); border-radius: 18px; padding: 16px 16px; outline:none; }
+    .inp:focus{ border-color: rgba(37,99,235,.75); box-shadow: 0 0 0 4px rgba(37,99,235,.20); }
+    .inpMega{ padding: 22px 18px; border-radius: 20px; font-size: clamp(26px, 5vw, 34px); letter-spacing: 6px; text-align:center; }
+    
+    .btn{ border:none; border-radius: 18px; padding: 16px 18px; font-weight: 900; font-size: var(--fsBtn); cursor:pointer; width:100%; color: var(--white); background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.12); -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+    .btn:active{ transform: scale(.99); }
+    .btn.primary{ background: linear-gradient(180deg, rgba(37,99,235,1), rgba(29,78,216,1)); border: 1px solid rgba(255,255,255,.10); }
+    .btnMega{ padding: 22px 18px; border-radius: 20px; margin-top: 16px; font-size: clamp(24px, 4.8vw, 32px); }
+    .btn.small{ width:auto; padding: 10px 14px; font-size: 15px; border-radius: 999px; }
+    .btn.ghost{ background: rgba(255,255,255,.08); }
+    .smallHint{ text-align:center; margin-top: 12px; font-size: 13px; font-weight: 800; color: var(--muted2); }
+    .smallHintBig{ font-size: 14px; }
+    
+    .topbar{ position: sticky; top: 0; z-index: 20; display:flex; align-items:center; justify-content:space-between; gap: 10px; padding: 12px 10px; margin: 0 -14px; background: rgba(11,18,32,.88); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,.10); }
+    .h1{ font-weight: 900; font-size: 18px; }
+    .h2{ font-weight: 800; font-size: 13px; color: var(--muted); margin-top:2px; }
+    
+    .panelContainer{ margin-top:10px; }
+    .panelLegend{ font-size:11px; color:var(--muted); margin-bottom:10px; background:rgba(255,255,255,.05); padding:10px; border-radius:12px; line-height: 1.4; }
+    .tableScroll{ overflow-x:auto; border-radius:14px; border:1px solid var(--line); }
+    table{ width:100%; border-collapse:collapse; white-space:nowrap; background:var(--card); }
+    th{ background:rgba(255,255,255,.08); padding:12px; text-align:left; font-size:13px; color:var(--muted); font-weight:800; position:sticky; top:0; z-index: 5; }
+    td{ padding:12px; border-top:1px solid var(--line); font-size:14px; vertical-align:middle; }
+    .st-A{ color: var(--ok); font-weight:bold; }
+    .st-T{ color: var(--warning); font-weight:bold; }
+    .st-F{ color: var(--danger); font-weight:bold; }
+    
+    .tdSelect{ background:var(--bg); color:#fff; border:1px solid var(--line); padding:8px; border-radius:8px; font-size:14px; width:80px; }
+    .tdBtn{ background:rgba(255,255,255,.1); border:none; border-radius:8px; width:36px; height:36px; display:inline-flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; }
+    .tdVal{ margin-right:6px; font-weight:bold; }
+    
+    .modalMask{ position: fixed; inset: 0; background: rgba(0,0,0,.62); backdrop-filter: blur(8px); z-index: 9999; display:none; align-items:center; justify-content:center; padding: 18px; }
+    .modalMask.show{ display:flex; }
+    .modalBox{ width: min(640px, 100%); background: rgba(17,24,39,.98); border: 1px solid rgba(255,255,255,.14); border-radius: 22px; box-shadow: 0 25px 70px rgba(0,0,0,.65); padding: 16px; }
+    .modalTitle{ font-weight: 900; font-size: 18px; color: rgba(255,255,255,.92); margin: 6px 6px 12px; }
+    .modalInput{ width:100%; border-radius: 18px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.06); color:#fff; outline:none; padding: 18px 16px; font-weight: 900; font-size: 26px !important; line-height: 1.2; }
+    .modalInputArea{ min-height: 120px; resize:none; font-size: 20px !important; font-weight: 800; }
+    .modalBtns{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    .modalBtn{ border:none; border-radius: 18px; padding: 16px 14px; font-weight: 900; font-size: 20px; cursor:pointer; width:100%; color: #fff; background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.12); }
+    .modalBtn.primary{ background: linear-gradient(180deg, rgba(37,99,235,1), rgba(29,78,216,1)); }
+    .modalBtn.danger{ background: rgba(239,68,68,.22); border-color: rgba(239,68,68,.35); }
+    input, select, textarea, .inp { font-size: 18px !important; touch-action: manipulation; }
+  </style>
+</head>
+<body>
+
+<section id="loginWrap" class="screen loginFull">
+  <div class="loginFullShell">
+    <div class="brand brandBig">
+      <div class="brandTitle">REY LIMA</div>
+      <div class="brandSub">Acceso Sistema</div>
+    </div>
+    <div class="loginFullCard">
+      <label class="lbl lblBig" for="pin">PIN de acceso</label>
+      <input id="pin" class="inp inpMega" type="password" inputmode="numeric" maxlength="10" placeholder="****" />
+      <button id="btnLogin" class="btn btnMega primary">Ingresar</button>
+      <div class="smallHint smallHintBig">Sistema Panel – REY LIMA</div> 
+    </div>
+  </div>
+</section>
+
+<section id="app" class="screen" style="display:none">
+  <header class="topbar">
+    <div class="topLeft">
+      <div class="h1" id="pageTitle">Panel Supervisor</div>
+      <div class="h2">REY LIMA</div> 
+    </div>
+    <button id="btnLogout" class="btn small danger" style="background:var(--danger); color:white; padding:8px 12px; border-radius:8px; font-weight:bold; border:none; width:auto;">Cerrar Sesión</button>
+  </header>
+
+  <div id="viewPanel">
+    <div class="panelContainer">
+      <div class="panelLegend">
+        <strong>Estados:</strong> A:Asistió, T:Tarde, F:Falta, V:Vacaciones, DL:Día Libre, DM:Descanso Médico, S:Suspensión.
+      </div>
+      <div class="tableScroll">
+        <table id="panelTable">
+          <thead>
+            <tr>
+              <th>Colaborador</th> <th>Tipo</th> <th>Tareo</th> <th>Min</th> <th>N.Tar</th> <th>N.Min</th> <th>Obs</th> 
+            </tr>
+          </thead>
+          <tbody id="panelBody">
+            <tr><td colspan="7" style="text-align:center; padding:20px;">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="text-align:center; margin-top:20px; margin-bottom:40px;">
+        <button id="btnRefresh" class="btn ghost">🔄 Actualizar Tabla</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="modalMask" class="modalMask">
+  <div class="modalBox">
+    <div id="modalTitle" class="modalTitle">Escribir</div>
+    <input id="modalInput" class="modalInput" type="text" autocomplete="off" />
+    <textarea id="modalArea" class="modalInput modalInputArea" style="display:none"></textarea>
+    <div class="modalBtns">
+      <button id="modalCancel" class="modalBtn danger">Cancelar</button>
+      <button id="modalOk" class="modalBtn primary">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<audio id="sndOk" src="https://actions.google.com/sounds/v1/cartoon/pop.ogg" preload="auto"></audio>
+<audio id="sndErr" src="https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg" preload="auto"></audio>
+
+<script>
+(() => {
+  // 🔥 AQUÍ VA TU NUEVA URL DESPLEGADA
+  const API_URL = "https://script.google.com/macros/s/AKfycbyaCvBu7C-VOvTBSgcJyMXfUllzUWWeY7As1nfY6mNgPwV7DtTjcEyFk6YnV5oBmdOm5g/exec";
+
+  let sessionToken = null;
+  let modalMode = null; 
+  let editContext = null; 
+
+  const $ = (id) => document.getElementById(id);
+  
+  const elLoginWrap = $('loginWrap'); const elApp = $('app'); const elPin = $('pin');
+  const btnLogin = $('btnLogin'); const btnLogout = $('btnLogout');
+  const panelBody = $('panelBody'); const btnRefresh = $('btnRefresh');
+  const modalMask = $('modalMask'); const modalTitle = $('modalTitle');
+  const modalInput = $('modalInput'); const modalArea = $('modalArea');
+  const modalCancel = $('modalCancel'); const modalOk = $('modalOk');
+  const sndOk = $('sndOk'); const sndErr = $('sndErr');
+
+  // Helper para interactuar con la API
+  async function fetchAPI(payload) {
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+      });
+      return await response.json();
+    } catch (error) {
+      return { ok: false, msg: "Error de red conectando al servidor." };
+    }
+  }
+
+  // LOGIN
+  btnLogin.onclick = async () => {
+    const pin = elPin.value.trim();
+    if (!pin) return alert('Ingresa el PIN');
+    
+    btnLogin.textContent = 'Verificando...';
+    btnLogin.disabled = true;
+
+    const res = await fetchAPI({ action: 'login_panel', pin: pin });
+
+    btnLogin.textContent = 'Ingresar';
+    btnLogin.disabled = false;
+
+    if (res.ok) {
+      sessionToken = res.token;
+      elLoginWrap.style.display = 'none';
+      elApp.style.display = 'block';
+      elPin.value = '';
+      loadPanelData();
+    } else {
+      playErr();
+      alert(res.msg);
+    }
+  };
+
+  // LOGOUT
+  btnLogout.onclick = () => {
+    sessionToken = null;
+    elApp.style.display = 'none';
+    elLoginWrap.style.display = 'flex';
+    elPin.value = '';
+  };
+
+  btnRefresh.onclick = loadPanelData;
+
+  async function loadPanelData() {
+    panelBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">Cargando datos...</td></tr>';
+    
+    const res = await fetchAPI({ action: 'get_panel', token: sessionToken });
+    
+    if (!res.ok) {
+      panelBody.innerHTML = `<tr><td colspan="7">Error: ${res.msg}</td></tr>`;
+      return;
+    }
+    renderTable(res.rows, res.estados);
+  }
+
+  function renderTable(rows, estados) {
+    panelBody.innerHTML = '';
+    if (!rows || rows.length === 0) {
+      panelBody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px;">No hay registros hoy.</td></tr>';
+      return;
+    }
+
+    rows.forEach(r => {
+      const tr = document.createElement('tr');
+      const tdColab = document.createElement('td');
+      tdColab.innerHTML = `<div style="font-weight:bold; font-size:13px;">${r.colab}</div>
+                           <div style="font-size:11px; opacity:0.6">${r.estado}</div>`;
+      
+      const tdTipo = document.createElement('td'); tdTipo.textContent = r.tipo || '-';
+      const tdTareo = document.createElement('td'); tdTareo.innerHTML = `<span class="st-${r.tareo}">${r.tareo || ''}</span>`;
+      const tdMin = document.createElement('td'); tdMin.textContent = r.min || '';
+      if (r.min > 0) tdMin.style.color = 'var(--danger)';
+
+      const tdNewT = document.createElement('td');
+      const sel = document.createElement('select'); sel.className = 'tdSelect';
+      estados.forEach(e => {
+        const opt = document.createElement('option'); opt.value = e; opt.textContent = e || '—';
+        if (r.newT === e) opt.selected = true;
+        sel.appendChild(opt);
+      });
+      if (r.remG <= 0) sel.disabled = true;
+      
+      sel.onchange = async () => {
+        // Optimistic UI update
+        sel.disabled = true;
+        const res = await fetchAPI({ action: 'update_cell', token: sessionToken, fila: r.fila, colLetra: 'G', valor: sel.value });
+        if (res.ok) {
+          playOk();
+          if (!res.unchanged && res.remaining <= 0) sel.disabled = true;
+          else sel.disabled = false;
+        } else {
+          playErr(); alert(res.msg);
+          sel.value = r.newT; // Rollback visual
+          sel.disabled = false;
+        }
+      };
+      tdNewT.appendChild(sel);
+
+      const tdNewM = document.createElement('td');
+      tdNewM.appendChild(createEditBtn(r.newM, r.remH, 'H', r.fila, true));
+
+      const tdObs = document.createElement('td');
+      tdObs.appendChild(createEditBtn(r.obs, r.remI, 'I', r.fila, false));
+
+      tr.append(tdColab, tdTipo, tdTareo, tdMin, tdNewT, tdNewM, tdObs);
+      panelBody.appendChild(tr);
+    });
+  }
+
+  function createEditBtn(val, rem, colLetra, fila, isNum) {
+    const wrap = document.createElement('div'); wrap.style.display = 'flex'; wrap.style.alignItems = 'center';
+    const span = document.createElement('span'); span.className = 'tdVal'; span.textContent = val || '';
+    const btn = document.createElement('button'); btn.className = 'tdBtn'; btn.textContent = '✏️';
+    
+    if (rem <= 0) btn.style.display = 'none';
+    btn.onclick = () => {
+      editContext = { fila: fila, col: colLetra, spanElement: span, btnElement: btn };
+      openModal(isNum ? 'panel_min' : 'panel_obs', span.textContent);
+    };
+    wrap.append(span, btn); return wrap;
+  }
+
+  function openModal(mode, initialValue) {
+    modalMode = mode; modalInput.style.display = 'none'; modalArea.style.display = 'none';
+    if (mode === 'panel_min') {
+      modalTitle.textContent = 'Minutos Tarde'; modalInput.style.display = 'block';
+      modalInput.value = initialValue || ''; modalInput.placeholder = '0'; modalInput.setAttribute('inputmode', 'numeric');
+    } else if (mode === 'panel_obs') {
+      modalTitle.textContent = 'Observación Panel'; modalArea.style.display = 'block';
+      modalArea.value = initialValue || ''; modalArea.placeholder = 'Justificación...';
+    }
+    modalMask.classList.add('show');
+    setTimeout(() => { if (mode.includes('obs')) modalArea.focus(); else modalInput.focus(); }, 200);
+  }
+
+  function closeModal() {
+    modalMask.classList.remove('show');
+    modalInput.blur(); modalArea.blur(); modalMode = null;
+  }
+
+  modalCancel.onclick = closeModal;
+  
+  modalOk.onclick = async () => {
+    let val = modalMode === 'panel_min' ? modalInput.value.trim() : modalArea.value.trim();
+    if (editContext) {
+      const { fila, col, spanElement, btnElement } = editContext;
+      if (col === 'H' && val && isNaN(val)) { alert('Solo números permitidos'); return; }
+      
+      closeModal();
+      
+      // Enviamos el cambio
+      btnElement.disabled = true;
+      const res = await fetchAPI({ action: 'update_cell', token: sessionToken, fila: fila, colLetra: col, valor: val });
+      
+      if (res.ok) {
+        playOk();
+        spanElement.textContent = val;
+        if (!res.unchanged && res.remaining <= 0) btnElement.style.display = 'none';
+        btnElement.disabled = false;
+      } else {
+        playErr(); alert(res.msg);
+        btnElement.disabled = false;
+      }
+    }
+  };
+
+  function playOk() { try { sndOk.currentTime=0; sndOk.play(); } catch(e){} }
+  function playErr() { try { sndErr.currentTime=0; sndErr.play(); } catch(e){} }
+})();
+</script>
+</body>
+</html>
